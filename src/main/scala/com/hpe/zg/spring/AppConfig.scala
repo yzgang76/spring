@@ -3,10 +3,11 @@ package com.hpe.zg.spring
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import akka.util.Timeout
+
 import scala.concurrent.duration._
 import akka.actor.typed.scaladsl.AskPattern._
-
 import com.alibaba.fastjson.JSONObject
+import com.typesafe.config.ConfigFactory
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.builder.SpringApplicationBuilder
 import org.springframework.web.bind.annotation.ResponseBody
@@ -50,7 +51,8 @@ object MyAkkaSystem {
 }
 
 object myApplication {
-    val system: ActorSystem[MyAkkaSystem.MyCommand] = ActorSystem[MyAkkaSystem.MyCommand](MyAkkaSystem(), "myakkasystem")
+    val system: ActorSystem[MyAkkaSystem.MyCommand] = ActorSystem[MyAkkaSystem.MyCommand](MyAkkaSystem(),
+        "myakkasystem", ConfigFactory.load("clustermanaer"))
 
     def main(args: Array[String]): Unit = {
         new SpringApplicationBuilder(classOf[AppConfig]).run(args: _*)
@@ -96,15 +98,13 @@ class indexController2 {
             result.setResult(json)
         })
 
-        val f: Future[MyAkkaSystem.MyCommand] = system.ask[MyAkkaSystem.MyCommand](ref => {
-            Request(ref)
-        })(timeout = timeout, scheduler = system.scheduler)
+        val f: Future[MyAkkaSystem.MyCommand] = system.ask[MyAkkaSystem.MyCommand](Request)(timeout = timeout, scheduler = system.scheduler)
         f.onComplete {
             case Success(r) =>
                 println(s"_________________ $r")
                 r match {
-                    case res@MyAkkaSystem.Response(_) =>result.setResult(res.toJson)
-                    case res:MyAkkaSystem.MyCommand=>  println(s"unknown response ${res} ")
+                    case res@MyAkkaSystem.Response(_) => result.setResult(res.toJson)
+                    case res: MyAkkaSystem.MyCommand => println(s"unknown response ${res} ")
                 }
             case Failure(e) => e.printStackTrace()
         }
