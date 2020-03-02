@@ -3,27 +3,43 @@ package com.hpe.zg.spring
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import akka.util.Timeout
+import akka.actor.typed.scaladsl.AskPattern._
 
 import scala.concurrent.duration._
-import akka.actor.typed.scaladsl.AskPattern._
+import scala.concurrent.{ExecutionContextExecutor, Future}
+import scala.util.{Failure, Success}
 import com.alibaba.fastjson.JSONObject
 import com.typesafe.config.ConfigFactory
+import org.springframework.beans.factory.annotation.{Autowired, Value}
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.builder.SpringApplicationBuilder
+import org.springframework.context.ApplicationContext
+import org.springframework.context.annotation._
+import org.springframework.context.support.ClassPathXmlApplicationContext
+import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.context.request.async.DeferredResult
 
-import scala.concurrent.{ExecutionContextExecutor, Future}
-import scala.util.{Failure, Success}
 
 @SpringBootApplication
 class AppConfig {
-    println(s"000000000000000000000000")
+    println(s"init AppConfig")
 }
+
+@Service("BeanService")
+class BeanService {
+
+    val id = Math.random()
+    println(s"sssssssssssssssssssssssssssssssssssss $id")
+
+    override def toString: String = s"BeanService - $id"
+}
+
 
 object MyAkkaSystem {
 
     sealed trait MyCommand
+
 
     final case class Request(ref: ActorRef[MyAkkaSystem.MyCommand]) extends MyAkkaSystem.MyCommand
 
@@ -36,13 +52,29 @@ object MyAkkaSystem {
         }
     }
 
+    ////////////////////////////////////////////////////////////////////
+    /*
+    spring test
+     */
+    //    @Autowired var beenConf: ConfigBean = _
+    //    println(s"bbbbbbbbb ${beenConf}")
+    println(s"********************************************************")
+    val context: ApplicationContext = new ClassPathXmlApplicationContext("cp_context.xml")
+    println(s"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
+    //    val cf2: AnyRef = context.getBean("configBeanJava")
+    //    println(s"cf2 $cf2")
+
+    val beanService: AnyRef = context.getBean("beanService")
+    println(s">>>>>>>>>>>>>>>>>>>>>>>>>>>> $beanService")
+
+    ///////////////////////////////////////////////////////////////////////
     def apply(): Behavior[MyAkkaSystem.MyCommand] = Behaviors.setup {
         context =>
             context.log.info(s"MyAkkaSystem starting")
             println(s"MyAkkaSystem starting")
             Behaviors.receiveMessage {
                 case Request(replyTo) =>
-                    replyTo ! Response("hello")
+                    replyTo ! Response(s"hello, I am $beanService")
                     Behaviors.same
                 case _ => Behaviors.same
             }
@@ -51,8 +83,8 @@ object MyAkkaSystem {
 }
 
 object myApplication {
-    val system: ActorSystem[MyAkkaSystem.MyCommand] = ActorSystem[MyAkkaSystem.MyCommand](MyAkkaSystem(),
-        "myakkasystem", ConfigFactory.load("clustermanaer"))
+    val system: ActorSystem[MyAkkaSystem.MyCommand] =
+        ActorSystem[MyAkkaSystem.MyCommand](MyAkkaSystem(), "myakkasystem", ConfigFactory.load("clustermanager"))
 
     def main(args: Array[String]): Unit = {
         new SpringApplicationBuilder(classOf[AppConfig]).run(args: _*)
@@ -64,8 +96,6 @@ import org.springframework.web.bind.annotation.{RequestMapping, RestController}
 
 @RestController
 class indexController {
-    println(s"11111111111111111")
-
     @RequestMapping(value = Array("/index"))
     def index(): JSONObject = {
         val json = new JSONObject
@@ -75,9 +105,25 @@ class indexController {
     }
 }
 
+import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.stereotype.Component
+
+@Configuration
+@ConfigurationProperties(prefix = "my")
+class ConfigBean {
+    var name: java.lang.String = _
+    var age: java.lang.Integer = 0
+
+    //    println(s"ConfigBean $name, $age")
+
+    override def toString(): String = {
+        s"name= $name, age=$age"
+    }
+
+}
+
 @RestController
 class indexController2 {
-    println(s"111111111111111112")
 
     @RequestMapping(value = Array("/akka"))
     @ResponseBody
@@ -85,11 +131,11 @@ class indexController2 {
         import myApplication.system
         import com.hpe.zg.spring.MyAkkaSystem._
 
-        implicit val timeout: Timeout = 59.seconds
+        implicit val timeout: Timeout = 5.seconds
         implicit val ec: ExecutionContextExecutor = system.executionContext
 
         import org.springframework.web.context.request.async.DeferredResult
-        val result = new DeferredResult[JSONObject](60 * 1000L)
+        val result = new DeferredResult[JSONObject](6 * 1000L)
         result.onTimeout(() => {
             println(s"DeferredResult overtime")
             val json = new JSONObject
@@ -104,10 +150,13 @@ class indexController2 {
                 println(s"_________________ $r")
                 r match {
                     case res@MyAkkaSystem.Response(_) => result.setResult(res.toJson)
-                    case res: MyAkkaSystem.MyCommand => println(s"unknown response ${res} ")
+                    case res: MyAkkaSystem.MyCommand => println(s"unknown response $res ")
                 }
-            case Failure(e) => e.printStackTrace()
+            case Failure(e) =>
+                e.printStackTrace()
+                result.setErrorResult(e.toString)
         }
         result
     }
 }
+
