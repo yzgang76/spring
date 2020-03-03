@@ -19,6 +19,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.context.request.async.DeferredResult
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 
 @SpringBootApplication
@@ -82,7 +83,7 @@ object MyAkkaSystem {
     }
 }
 
-object myApplication {
+object MyApplication {
     val system: ActorSystem[MyAkkaSystem.MyCommand] =
         ActorSystem[MyAkkaSystem.MyCommand](MyAkkaSystem(), "myakkasystem", ConfigFactory.load("clustermanager"))
 
@@ -106,7 +107,7 @@ class indexController {
 }
 
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.stereotype.Component
+
 
 @Configuration
 @ConfigurationProperties(prefix = "my")
@@ -116,7 +117,7 @@ class ConfigBean {
 
     //    println(s"ConfigBean $name, $age")
 
-    override def toString(): String = {
+    override def toString: String = {
         s"name= $name, age=$age"
     }
 
@@ -128,7 +129,7 @@ class indexController2 {
     @RequestMapping(value = Array("/akka"))
     @ResponseBody
     def akka(): DeferredResult[JSONObject] = {
-        import myApplication.system
+        import MyApplication.system
         import com.hpe.zg.spring.MyAkkaSystem._
 
         implicit val timeout: Timeout = 5.seconds

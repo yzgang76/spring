@@ -31,13 +31,11 @@
         <platform-bom.version>2.2.5.RELEASE</platform-bom.version>
         <spring-boot-starter-bom.version>2.2.5.RELEASE</spring-boot-starter-bom.version>
         <spring-boot.version>2.2.5.RELEASE</spring-boot.version>
-        <springloaded.version>1.2.8.RELEASE</springloaded.version>
         <fastjson.version>1.2.62</fastjson.version>
-        <maven-scala-plugin.version>2.15.2</maven-scala-plugin.version>
     </properties>
 
     <dependencies>
-        <!--        spring-->
+<!--        spring-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
@@ -66,15 +64,20 @@
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
         </dependency>
+        <!--<dependency>-->
+        <!--<groupId>com.company.common</groupId>-->
+        <!--<artifactId>common-files</artifactId>-->
+        <!--<version>0.0.1-SNAPSHOT</version>-->
+        <!--</dependency>-->
 
-        <!--        scala-->
+<!--        scala-->
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
             <version>${scala.version}</version>
         </dependency>
 
-        <!--        akka-->
+<!--        akka-->
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-actor_${scala.version.base}</artifactId>
@@ -86,7 +89,7 @@
             <version>${akka.version}</version>
         </dependency>
 
-        <!--        others-->
+<!--        others-->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
@@ -102,7 +105,6 @@
             <plugin>
                 <groupId>org.scala-tools</groupId>
                 <artifactId>maven-scala-plugin</artifactId>
-                <version>${maven-scala-plugin.version}</version>
                 <executions>
                     <execution>
                         <goals>
@@ -130,13 +132,11 @@
                 </configuration>
                 <dependencies>
                     <!-- spring热部署-->
-                    <!-- https://mvnrepository.com/artifact/org.springframework/springloaded -->
                     <dependency>
                         <groupId>org.springframework</groupId>
                         <artifactId>springloaded</artifactId>
-                        <version>${springloaded.version}</version>
+                        <version>1.2.6.RELEASE</version>
                     </dependency>
-
                 </dependencies>
             </plugin>
 
@@ -181,16 +181,6 @@
 
     <repositories>
         <repository>
-            <id>repo1</id>
-            <name>Human Readable Name for this Mirror.</name>
-            <url>http://repo1.maven.org/maven2/</url>
-        </repository>
-        <repository>
-            <id>alimaven</id>
-            <name>aliyun maven</name>
-            <url>http://maven.aliyun.com/nexus/content/repositories/central/</url>
-        </repository>
-        <repository>
             <id>scala-tools.org</id>
             <name>Scala-Tools Maven2 Repository</name>
             <url>http://scala-tools.org/repo-releases</url>
@@ -205,23 +195,26 @@
         </pluginRepository>
     </pluginRepositories>
 
-<!--    <dependencyManagement>-->
-<!--        <dependencies>-->
-<!--            <dependency>-->
-<!--                <groupId>org.springframework.boot</groupId>-->
-<!--                <artifactId>spring-boot-dependencies</artifactId>-->
-<!--                <version>${spring-boot.version}</version>-->
-<!--                <type>pom</type>-->
-<!--                <scope>import</scope>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--                <groupId>io.spring.platform</groupId>-->
-<!--                <artifactId>platform-bom</artifactId>-->
-<!--                <version>${platform-bom.version}</version>-->
-<!--                <type>pom</type>-->
-<!--                <scope>import</scope>-->
-<!--            </dependency>-->
-<!--        </dependencies>-->
-<!--    </dependencyManagement>-->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.spring.platform</groupId>
+                <artifactId>platform-bom</artifactId>
+                <version>${platform-bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+
+
 </project>
 
