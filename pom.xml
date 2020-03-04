@@ -34,6 +34,7 @@
         <springloaded.version>1.2.8.RELEASE</springloaded.version>
         <fastjson.version>1.2.62</fastjson.version>
         <maven-scala-plugin.version>2.15.2</maven-scala-plugin.version>
+        <docker-maven-plugin.version>1.2.2</docker-maven-plugin.version>
     </properties>
 
     <dependencies>
@@ -148,6 +149,34 @@
                 <!--</configuration>-->
             </plugin>
 
+            <plugin>
+                <executions>
+                    <execution>
+                        <id>build-image</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>${docker-maven-plugin.version}</version>
+                <configuration>
+                    <imageName>spring-scala:0.1-SNAPSHOT</imageName>
+                    <baseImage>java</baseImage>
+                    <exposes>8081</exposes>
+                    <entryPoint>["java", "-jar", "/${project.build.finalName}.jar"]</entryPoint>
+                    <resources>
+                        <resource>
+                            <targetPath>/</targetPath>
+                            <directory>${project.build.directory}</directory>
+                            <include>${project.build.finalName}.jar</include>
+                        </resource>
+                    </resources>
+                </configuration>
+            </plugin>
+
 
             <!--<plugin>-->
             <!--<groupId>org.apache.maven.plugins</groupId>-->
@@ -198,6 +227,11 @@
     </repositories>
 
     <pluginRepositories>
+        <pluginRepository>
+            <id>alimaven</id>
+            <name>aliyun maven</name>
+            <url>http://maven.aliyun.com/nexus/content/repositories/central/</url>
+        </pluginRepository>
         <pluginRepository>
             <id>scala-tools.org</id>
             <name>Scala-Tools Maven2 Repository</name>
