@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: zgtesting-1
-          image: yzgang1976/zgtesting_1:0.1
+          image: yzgang1976/zgtesting_1:0.3
           ports:
             - containerPort: 8081
               protocol: TCP
