@@ -19,3 +19,8 @@ spec:
           ports:
             - containerPort: 8081
               protocol: TCP
+        - name: host-info-service
+          image: yzgang1976/host-info-service:latest
+          ports:
+            - containerPort: 8082
+              protocol: TCP

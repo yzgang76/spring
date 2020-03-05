@@ -9,7 +9,12 @@ spec:
   ports:
     - port: 8081
       targetPort: 8081
+      name: testing
       nodePort: 31081
+    - port: 8082
+      targetPort: 8082
+      name: host-info
+      nodePort: 31082
   selector:
     app: zgtesting-1
   type: NodePort
