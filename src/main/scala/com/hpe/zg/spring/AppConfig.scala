@@ -4,23 +4,18 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import akka.util.Timeout
 import akka.actor.typed.scaladsl.AskPattern._
-
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.util.{Failure, Success}
 import com.alibaba.fastjson.JSONObject
 import com.typesafe.config.ConfigFactory
-import org.springframework.beans.factory.annotation.{Autowired, Value}
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.builder.SpringApplicationBuilder
 import org.springframework.context.ApplicationContext
-import org.springframework.context.annotation._
 import org.springframework.context.support.ClassPathXmlApplicationContext
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.context.request.async.DeferredResult
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
-
 
 @SpringBootApplication
 class AppConfig {
@@ -29,21 +24,14 @@ class AppConfig {
 
 @Service("BeanService")
 class BeanService {
-
-    val id = Math.random()
-    println(s"sssssssssssssssssssssssssssssssssssss $id")
-
+    val id: Double = Math.random()
     override def toString: String = s"BeanService - $id"
 }
 
 
 object MyAkkaSystem {
-
     sealed trait MyCommand
-
-
     final case class Request(ref: ActorRef[MyAkkaSystem.MyCommand]) extends MyAkkaSystem.MyCommand
-
     final case class Response(msg: String) extends MyAkkaSystem.MyCommand {
         def toJson: JSONObject = {
             val json = new JSONObject
@@ -53,22 +41,9 @@ object MyAkkaSystem {
         }
     }
 
-    ////////////////////////////////////////////////////////////////////
-    /*
-    spring test
-     */
-    //    @Autowired var beenConf: ConfigBean = _
-    //    println(s"bbbbbbbbb ${beenConf}")
-    println(s"********************************************************")
     val context: ApplicationContext = new ClassPathXmlApplicationContext("cp_context.xml")
-    println(s"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
-    //    val cf2: AnyRef = context.getBean("configBeanJava")
-    //    println(s"cf2 $cf2")
-
     val beanService: AnyRef = context.getBean("beanService")
-    println(s">>>>>>>>>>>>>>>>>>>>>>>>>>>> $beanService")
 
-    ///////////////////////////////////////////////////////////////////////
     def apply(): Behavior[MyAkkaSystem.MyCommand] = Behaviors.setup {
         context =>
             context.log.info(s"MyAkkaSystem starting")
@@ -79,7 +54,6 @@ object MyAkkaSystem {
                     Behaviors.same
                 case _ => Behaviors.same
             }
-
     }
 }
 
@@ -106,26 +80,8 @@ class indexController {
     }
 }
 
-import org.springframework.boot.context.properties.ConfigurationProperties
-
-
-@Configuration
-@ConfigurationProperties(prefix = "my")
-class ConfigBean {
-    var name: java.lang.String = _
-    var age: java.lang.Integer = 0
-
-    //    println(s"ConfigBean $name, $age")
-
-    override def toString: String = {
-        s"name= $name, age=$age"
-    }
-
-}
-
 @RestController
 class indexController2 {
-
     @RequestMapping(value = Array("/akka"))
     @ResponseBody
     def akka(): DeferredResult[JSONObject] = {
@@ -136,6 +92,7 @@ class indexController2 {
         implicit val ec: ExecutionContextExecutor = system.executionContext
 
         import org.springframework.web.context.request.async.DeferredResult
+
         val result = new DeferredResult[JSONObject](6 * 1000L)
         result.onTimeout(() => {
             println(s"DeferredResult overtime")
@@ -148,7 +105,6 @@ class indexController2 {
         val f: Future[MyAkkaSystem.MyCommand] = system.ask[MyAkkaSystem.MyCommand](Request)(timeout = timeout, scheduler = system.scheduler)
         f.onComplete {
             case Success(r) =>
-                println(s"_________________ $r")
                 r match {
                     case res@MyAkkaSystem.Response(_) => result.setResult(res.toJson)
                     case res: MyAkkaSystem.MyCommand => println(s"unknown response $res ")

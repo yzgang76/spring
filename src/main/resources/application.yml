@@ -2,19 +2,15 @@ server:
   port: 8081
 logging:
   level:
-    root: ERROR
+    root: INFO
     org:
       springframework:
-        beans: ERROR
-        security: ERROR
-        web: ERROR
-      hibernate: ERROR
+        beans: INFO
+        security: INFO
+        web: INFO
+      hibernate: INFO
       apache:
         commons:
-          dbcp2: ERROR
-
+          dbcp2: INFO
   pattern:
     console: '%d{yyyy-MMM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{15} - %msg%n'
-my:
-  name: forezp
-  age: 12
