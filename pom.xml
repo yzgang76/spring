@@ -37,6 +37,9 @@
         <maven-scala-plugin.version>2.15.2</maven-scala-plugin.version>
         <docker-maven-plugin.version>1.2.2</docker-maven-plugin.version>
         <expose.port>8081</expose.port>
+        <kafka.version>2.4.0</kafka.version>
+        <log4j.version>1.7.30</log4j.version>
+        <logback.version>1.2.3</logback.version>
     </properties>
 
     <dependencies>
@@ -74,12 +77,32 @@
             <version>${akka-http.version}</version>
         </dependency>
 
-        <!--        others-->
+<!--        kafka-->
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka_${scala.version.base}</artifactId>
+            <version>${kafka.version}</version>
+        </dependency>
+
+        <!--        JSON-->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
             <version>${fastjson.version}</version>
         </dependency>
+
+<!--        logback-->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+
 
     </dependencies
     >
