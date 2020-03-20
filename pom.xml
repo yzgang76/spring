@@ -40,10 +40,11 @@
         <kafka.version>2.4.0</kafka.version>
         <log4j.version>1.7.30</log4j.version>
         <logback.version>1.2.3</logback.version>
+        <swagger.version>2.9.2</swagger.version>
     </properties>
 
     <dependencies>
-        <!--        spring-->
+        <!--spring-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
@@ -53,14 +54,14 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!--        scala-->
+        <!--scala-->
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
             <version>${scala.version}</version>
         </dependency>
 
-        <!--        akka-->
+        <!--akka-->
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-actor-typed_${scala.version.base}</artifactId>
@@ -77,21 +78,21 @@
             <version>${akka-http.version}</version>
         </dependency>
 
-<!--        kafka-->
+        <!--kafka-->
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka_${scala.version.base}</artifactId>
             <version>${kafka.version}</version>
         </dependency>
 
-        <!--        JSON-->
+        <!--JSON-->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
             <version>${fastjson.version}</version>
         </dependency>
 
-<!--        logback-->
+        <!--logback-->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
@@ -103,9 +104,20 @@
             <version>${logback.version}</version>
         </dependency>
 
+        <!--swagger-->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
 
-    </dependencies
-    >
+
+    </dependencies>
     <build>
         <sourceDirectory>src/main/scala</sourceDirectory>
         <testSourceDirectory>src/test/scala</testSourceDirectory>
