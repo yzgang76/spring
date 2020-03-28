@@ -1,0 +1,41 @@
+{
+  "type": "OSSM Transformer",
+  "name" : "Change AdditionalText",
+  "shapes": [
+    {
+      "id": 1,
+      "type": "source",
+      "dimension": "temip_raw",
+      "attribute": []
+    },
+    {
+      "id": 2,
+      "type": "target",
+      "dimension": "temip_alarm",
+      "attribute": []
+    },
+    {
+      "id": 3,
+      "type": "target",
+      "dimension": "temip_alarm2",
+      "attribute": []
+    },
+    {
+      "id": 4,
+      "type": "map",
+      "from": 1,
+      "to": 2,
+      "autoMapping": true,
+      "mappings": [
+        {
+          "sourceField": "String.Function.concatenate('transformer',${_key},${additional_text}})",
+          "targetField": "additional_text"
+        },
+        {
+          "sourceField": "String.Function.concatenate('transformer',${_key},${additional_text}})",
+          "targetField": "additional_text"
+        }
+      ]
+    }
+  ]
+}

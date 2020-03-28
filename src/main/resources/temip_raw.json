@@ -1,0 +1,33 @@
+{
+  "name": "temip_raw",
+  "version": "1.0",
+  "fields": [
+    {
+      "name": "identify",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "additional_text",
+      "type": "string"
+    },
+    {
+      "name": "severity",
+      "type": "string",
+      "values": "critical, warning, minor, major"
+    },
+    {
+      "name": "create_time",
+      "type": "long"
+    },
+    {
+      "name": "update_time",
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    },
+    {
+      "name": "clear",
+      "type": "boolean"
+    }
+  ]
+}

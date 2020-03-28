@@ -1,19 +1,12 @@
 package com.hpe.zg.spring
 
+import akka.actor.typed.scaladsl.AskPattern._
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import akka.util.Timeout
-import akka.actor.typed.scaladsl.AskPattern._
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.{HttpMethods, HttpRequest, HttpResponse}
-import akka.stream.Materializer
-
-import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContextExecutor, Future}
-import scala.util.{Failure, Success}
-import com.alibaba.fastjson.{JSON, JSONObject}
+import com.alibaba.fastjson.JSONObject
 import com.typesafe.config.ConfigFactory
-import io.swagger.annotations.{ApiImplicitParams, ApiImplicitParam, ApiOperation}
+import io.swagger.annotations.{ApiImplicitParam, ApiImplicitParams, ApiOperation}
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.builder.SpringApplicationBuilder
 import org.springframework.context.ApplicationContext
@@ -27,6 +20,9 @@ import springfox.documentation.service.{ApiInfo, Contact}
 import springfox.documentation.spi.DocumentationType
 import springfox.documentation.spring.web.plugins.Docket
 import springfox.documentation.swagger2.annotations.EnableSwagger2
+import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContextExecutor, Future}
+import scala.util.{Failure, Success}
 
 
 @EnableSwagger2

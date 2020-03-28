@@ -39,4 +39,13 @@ object Utils {
         }
         result
     }
+
+    def using[A <: {def close(): Unit}, B](resource: A)(f: A => B)(l: Throwable => B): B =
+        try {
+            f(resource)
+        } catch {
+            case e: Throwable => l(e)
+        } finally {
+            if (resource != null) resource.close()
+        }
 }
