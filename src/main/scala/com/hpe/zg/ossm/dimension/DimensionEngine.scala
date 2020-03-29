@@ -29,6 +29,14 @@ object DimensionFactory {
 case class DimensionData(name: String,
                          ts: Long,
                          data: util.HashMap[String, java.io.Serializable]) extends java.io.Serializable {
+
+    override def toString:String={
+        val json= new JSONObject()
+        json.put("name", name)
+        json.put("ts", ts)
+        json.put("data",new JSONObject(data))
+        json.toString
+    }
 }
 
 object Dimension {

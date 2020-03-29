@@ -15,7 +15,7 @@ object Field {
                 `type` = map.get("type").toString,
                 unique = map.getOrDefault("unique", false).asInstanceOf[Boolean],
                 enum = try {
-                    val s = map.get("enum").toString
+                    val s = map.get("values").toString
                     Some(s.split(","))
                 } catch {
                     case _: Throwable => None
@@ -67,7 +67,7 @@ case class Field(name: String, `type`: String, unique: Boolean, enum: Option[Arr
         `type` match {
             case "string" =>
                 if (unique)  name + System.currentTimeMillis
-                else if (enum.isDefined) randomValue(enum.get)
+                else if (enum.isDefined) randomValue(enum.get).trim
                 else  name
             case "long" =>  long2Long(System.currentTimeMillis)
             case "int" => int2Integer((math.random * 100.0).round.toInt)
