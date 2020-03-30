@@ -2,7 +2,6 @@ package com.hpe.zg.ossm.dimension
 
 import java.text.SimpleDateFormat
 
-import org.json.JSONObject
 import org.slf4j.LoggerFactory
 
 object Field {
@@ -31,48 +30,52 @@ object Field {
         }
     }
 
-   /* def fromJson(str: String): Option[Field] = {
-        try {
-            val ob = new JSONObject(str)
-            Some(Field(
-                name = ob.getString("name"),
-                `type` = ob.getString("type"),
-                unique = try ob.getBoolean("unique") catch {
-                    case _: Throwable => false
-                },
-                enum = try {
-                    val s = ob.getString("enum")
-                    Some(s.split(","))
-                } catch {
-                    case _: Throwable => None
-                },
-                format = try Some(ob.getString("format")) catch {
-                    case _: Throwable => None
-                })
-            )
-        } catch {
-            case e: Throwable =>
-                logger.error(s"Wrong in field definition $str, $e")
-                None
-        }
-    }*/
+    /* def fromJson(str: String): Option[Field] = {
+         try {
+             val ob = new JSONObject(str)
+             Some(Field(
+                 name = ob.getString("name"),
+                 `type` = ob.getString("type"),
+                 unique = try ob.getBoolean("unique") catch {
+                     case _: Throwable => false
+                 },
+                 enum = try {
+                     val s = ob.getString("enum")
+                     Some(s.split(","))
+                 } catch {
+                     case _: Throwable => None
+                 },
+                 format = try Some(ob.getString("format")) catch {
+                     case _: Throwable => None
+                 })
+             )
+         } catch {
+             case e: Throwable =>
+                 logger.error(s"Wrong in field definition $str, $e")
+                 None
+         }
+     }*/
 }
 
 case class Field(name: String, `type`: String, unique: Boolean, enum: Option[Array[String]], format: Option[String]) {
     private val logger = LoggerFactory.getLogger(classOf[Field])
 
-    private def randomValue[T](list: Array[T]): T = list((math.random() * list.length).round.toInt)
+    private def randomValue[T](list: Array[T]): T = list(math.min((math.random() * list.length).round.toInt, list.length - 1))
 
     def createValue(): java.io.Serializable = {
         `type` match {
             case "string" =>
-                if (unique)  name + System.currentTimeMillis
-                else if (enum.isDefined) randomValue(enum.get).trim
-                else  name
-            case "long" =>  long2Long(System.currentTimeMillis)
+                if (unique) name + System.currentTimeMillis
+                else if (enum.isDefined) try {
+                    randomValue(enum.get).trim
+                } catch {
+                    case _: Throwable => name
+                }
+                else name
+            case "long" => long2Long(System.currentTimeMillis)
             case "int" => int2Integer((math.random * 100.0).round.toInt)
-            case "double" =>  double2Double(math.random * 1000.0)
-            case "float" =>float2Float((math.random * 1000.0).toFloat)
+            case "double" => double2Double(math.random * 1000.0)
+            case "float" => float2Float((math.random * 1000.0).toFloat)
             case "date" =>
                 val d: SimpleDateFormat = try {
                     new SimpleDateFormat(format.getOrElse("yyyy-MM-dd HH:mm:ss"))
@@ -83,7 +86,7 @@ case class Field(name: String, `type`: String, unique: Boolean, enum: Option[Arr
                 }
                 d.format(System.currentTimeMillis)
             case "boolean" => boolean2Boolean(math.random > 0.5)
-            case _ =>throw new IllegalArgumentException(s"not support the type ${`type`}")
+            case _ => throw new IllegalArgumentException(s"not support the type ${`type`}")
         }
     }
 

@@ -1,0 +1,32 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "type": "source",
+      "definition": {
+        "type": "simulate",
+        "dimension": "temip_raw",
+        "attributes": {
+          "period": -1
+        }
+      }
+    },
+    {
+      "id": "2",
+      "type": "sink",
+      "definition": {
+        "type": "console",
+        "dimension": "temip_raw"
+      }
+    }
+  ],
+  "flows": [
+  ],
+  "graph": [
+    {
+      "from": "1",
+      "to": "2",
+      "via": []
+    }
+  ]
+}

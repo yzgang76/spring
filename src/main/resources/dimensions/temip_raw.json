@@ -28,6 +28,11 @@
     {
       "name": "clear",
       "type": "boolean"
+    },
+    {
+      "name": "event_type",
+      "type": "string",
+      "values": "INSERT"
     }
   ]
 }
