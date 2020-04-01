@@ -19,18 +19,21 @@ case class FlowMap(map: util.Map[String, AnyRef]) extends OssmFlow {
     private val logger = LoggerFactory.getLogger(classOf[FlowMap])
 
     def get: Flow[Serializable, Serializable, NotUsed] =
-        Flow[Serializable].map {
-            case m: util.Map[String, Serializable] =>
-                try {
-                    val fun = map.get("function").asInstanceOf[util.Map[String, Serializable]]
-                    fun.forEach((k, v) => {
-                        m.put(k, v)
-                    })
-                    m
-                } catch {
-                    case e: Throwable => logger.error(s"error in mapping $e")
+        Flow[Serializable].map { d =>
+            d match {
+                case m: util.Map[String, Serializable] =>
+                    try {
+                        val fun = map.get("function").asInstanceOf[util.Map[String, Serializable]]
+                        fun.forEach((k, v) => {
+                            m.put(k, v)
+                        })
                         m
-                }
-            case e: Serializable => e
+                    } catch {
+                        case e: Throwable => logger.error(s"error in mapping $e")
+                            m
+                    }
+                case e: Serializable => e
+            }
+
         }
 }

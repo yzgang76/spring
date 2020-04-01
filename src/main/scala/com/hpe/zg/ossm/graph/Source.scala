@@ -22,8 +22,8 @@ case class SourceSimulator(map: util.Map[String, AnyRef]) extends OssmSource {
         )(e => throw e)
     }
     if (dimension.isEmpty) throw new ExceptionInInitializerError(s"Failed to create dimension ${map.get("dimension")}")
-    val interval: Int = map.getOrDefault("interval", "0").asInstanceOf[Int]
-    val number: Int = map.getOrDefault("number", "1").asInstanceOf[Int]
+    val interval: Int = map.getOrDefault("interval", new Integer(0)).asInstanceOf[Int]
+    val number: Int = map.getOrDefault("number", new Integer(1)).asInstanceOf[Int]
 
     def get: Source[util.HashMap[String, Serializable], NotUsed] = {
         if (interval < 0) Source.single(dimension.get.generateValue().data)

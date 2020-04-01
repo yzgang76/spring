@@ -96,7 +96,7 @@ object GraphTest extends App {
     import com.hpe.zg.util.Utils
 
     val map = {
-        val path = GraphTest.getClass.getResource("/").getPath + "graphs/simple.json"
+        val path = GraphTest.getClass.getResource("/").getPath + "graphs/scenario1.json"
 
         implicit val codec: Codec = Codec.UTF8
 
@@ -126,24 +126,19 @@ object GraphTest extends App {
         nodes.asScala.collect {
             case node: util.Map[String, AnyRef]
                 if Node_Type.SOURCE_SIMULATOR.equals(node.get("type").toString) =>
-                //                sources(node.get("id").toString) = SourceSimulator(node).get
                 shapes(node.get("id").toString) = SourceSimulator(node).get
             case node: util.Map[String, AnyRef]
                 if Node_Type.SINK_LAST.equals(node.get("type").toString) =>
-                //                sinks(node.get("id").toString) = SinkLast(node).get
                 shapes(node.get("id").toString) = SinkLast(node).get
             case node: util.Map[String, AnyRef]
                 if Node_Type.SINK_PRINT.equals(node.get("type").toString) =>
-                //                sinks(node.get("id").toString) = SinkLast(node).get
                 shapes(node.get("id").toString) = SinkPrint(node).get
             case node: util.Map[String, AnyRef]
                 if Node_Type.SHAPE_BROADCAST.equals(node.get("type").toString) =>
-                //                shapeBroadcasts(node.get("id").toString) = ShapeBroadcast(node, builder).get
-                shapes(node.get("id").toString) = ShapeBroadcast(node).get
+                shapes(node.get("id").toString) = builder.add(ShapeBroadcast(node).get)
             case node: util.Map[String, AnyRef]
                 if Node_Type.SHAPE_MERGE.equals(node.get("type").toString) =>
-                //                shapeMerges(node.get("id").toString) = ShapeMerge(node, builder).get
-                shapes(node.get("id").toString) = ShapeBroadcast(node).get
+                shapes(node.get("id").toString) = builder.add(ShapeMerge(node).get)
             case _ =>
         }
 
@@ -157,33 +152,51 @@ object GraphTest extends App {
                 flows(node.get("id").toString) = FlowMap(node).get
             case _ =>
         }
+
+
+        @scala.annotation.tailrec
+        def connectToFlows(out: PortOps[Serializable], flows: List[Flow[Serializable, Serializable, AnyRef]]): PortOps[Serializable] =
+            if (flows.isEmpty) out
+            else connectToFlows(out ~> flows.head, flows.slice(1, flows.length))
+
         val connections = map.get("connections").asInstanceOf[util.ArrayList[util.Map[String, AnyRef]]]
         connections.forEach(conn => {
             val fromId = conn.get("from").toString
-            val from = shapes.getOrElse(fromId, null) match {
-                case s: Graph[SourceShape[Serializable], Any] => builder.add(s).out
-                case s: GraphStage[UniformFanOutShape[Serializable, Serializable]] => builder.add(s).out(getPort(fromId, "out"))
-                case s: GraphStage[MergePreferred.MergePreferredShape[Serializable]] => builder.add(s).out
+            //            println(s"from $fromId")
+            val from = shapes(fromId) match {
+                case s: Graph[SourceShape[Serializable], Any] =>
+                    println(s"from source out")
+                    builder.add(s).out
+                case s: UniformFanOutShape[Serializable, Serializable] =>
+                    val port = getPort(fromId, "out")
+                    println(s"from broadcast out $port");
+                    s.out(port)
+                case s: MergePreferred.MergePreferredShape[Serializable] =>
+                    println(s"from merge out");
+                    s.out
+
             }
 
             val toId = conn.get("to").toString
-            val to = shapes.getOrElse(toId, null) match {
-                case s: Graph[SinkShape[Serializable], Any] => builder.add(s).in
-                case s: GraphStage[UniformFanOutShape[Serializable, Serializable]] => builder.add(s).in
-                case s: GraphStage[MergePreferred.MergePreferredShape[Serializable]] => builder.add(s).in(getPort(toId, "in"))
+            val to = shapes(toId) match {
+                case s: UniformFanOutShape[Serializable, Serializable] =>
+                    println(s"to broadcast in ")
+                    s.in
+                case s: MergePreferred.MergePreferredShape[Serializable] =>
+                    val port = getPort(toId, "in")
+                    println(s"to merge in $port");
+                    s.in(port)
+                case s: Graph[SinkShape[Serializable], Any] =>
+                    println(s"to sink in")
+                    builder.add(s).in
             }
 
-            @scala.annotation.tailrec
-            def connectToFlows(out: PortOps[Serializable], flows: List[Flow[Serializable, Serializable, AnyRef]]): PortOps[Serializable] =
-                if (flows.isEmpty) out
-                else connectToFlows(out ~> flows.head, flows.slice(1, flows.length))
-
             val viaIds = conn.get("via").asInstanceOf[util.ArrayList[String]]
+            println(s"via $viaIds")
+            println(s"---------------------")
             connectToFlows(from, viaIds.asScala.map(id => flows(id)).toList) ~> to
 
         })
-
-        //                Source.single(1) ~> Sink.ignore
         ClosedShape
     })
 

@@ -4,7 +4,7 @@
       "id": "in",
       "type": "source_simulator",
       "dimension": "temip_raw",
-      "interval": -1
+      "interval": 1000
     },
     {
       "id": "broadcast",
@@ -18,7 +18,7 @@
     },
     {
       "id": "out",
-      "type": "sink_last"
+      "type": "sink_print"
     }
   ],
   "flows": [
@@ -29,7 +29,9 @@
     {
       "id": "mkDelete",
       "type": "flow_map",
-      "function": "{\"event_type\"=\"DELETE\"}"
+      "function": {
+        "event_type": "DELETE"
+      }
     }
   ],
   "connections": [

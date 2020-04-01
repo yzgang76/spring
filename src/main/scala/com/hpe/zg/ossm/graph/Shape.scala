@@ -10,7 +10,8 @@ import akka.stream.stage.GraphStage
 trait OssmShape extends OssmGraphNode
 
 case class ShapeBroadcast(map: util.Map[String, AnyRef]) extends OssmShape {
-    def get: GraphStage[UniformFanOutShape[Serializable, Serializable]] = Broadcast[Serializable](map.get("out").asInstanceOf[Int])
+    println(s"bbbbbbbbbb $map")
+    def get: GraphStage[UniformFanOutShape[Serializable, Serializable]] = Broadcast[Serializable](2)
 }
 
 case class ShapeMerge(map: util.Map[String, AnyRef]) extends OssmShape {
