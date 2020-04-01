@@ -2,8 +2,8 @@ package com.hpe.zg.ossm.dimension
 
 import java.util.Optional
 
+import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior, PostStop}
-import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import com.hpe.zg.akka.message.OssmBeMessage
 import com.hpe.zg.util.Utils
 
@@ -20,28 +20,28 @@ object DimensionRepository {
 
     final case class GetDimensionResponse(dimension: Dimension, msg: String) extends DimensionRepositoryMessage
 
-    private def setupDimensionRepository(repository: mutable.HashMap[String, Dimension], context: ActorContext[DimensionRepositoryMessage]): Unit = {
-        val path = DimensionTest.getClass.getResource("/").getPath + "dimensions"
-        implicit val codec: Codec = Codec.UTF8
-
-        val dir = new java.io.File(path)
-        for (file <- dir.listFiles.filter(f => f.getName.endsWith(".json"))) {
-            Utils.using(Source.fromFile(file.getPath))(buff => {
-                Dimension(buff.mkString) match {
-                    case Some(d) => repository(d.name) = d
-                    case None => println(s"Failed to create Dimension")
-                }
-            })(e => {
-                context.log.error(s"Error during create JSONObject $e")
-                null
-            })
-        }
-    }
-
-    def apply(repository: mutable.HashMap[String, Dimension]): Behavior[DimensionRepositoryMessage] = {
+    def apply(repository: mutable.HashMap[String, Dimension]): Behavior[DimensionRepositoryMessage] =
         Behaviors.setup { context =>
             context.log.debug(s"DimensionRepository Starting")
-            setupDimensionRepository(repository, context)
+
+            def setupDimensionRepository(): Unit = {
+                val path = DimensionRepository.getClass.getResource("/").getPath + "dimensions"
+                implicit val codec: Codec = Codec.UTF8
+
+                val dir = new java.io.File(path)
+                for (file <- dir.listFiles.filter(f => f.getName.endsWith(".json"))) {
+                    Utils.using(Source.fromFile(file.getPath))(buff => {
+                        Dimension(buff.mkString) match {
+                            case Some(d) => repository(d.name) = d
+                            case None => println(s"Failed to create Dimension")
+                        }
+                    })(e => {
+                        context.log.error(s"Error during create JSONObject $e")
+                    })
+                }
+            }
+
+            setupDimensionRepository()
             Behaviors.receiveMessage[DimensionRepositoryMessage] {
                 case Register(d) =>
                     Optional.ofNullable(Dimension(d).orNull).map(dim => repository(dim.name) = dim)
@@ -60,5 +60,4 @@ object DimensionRepository {
                     Behaviors.same
             }
         }
-    }
 }

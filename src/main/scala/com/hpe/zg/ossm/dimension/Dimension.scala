@@ -55,6 +55,7 @@ class Dimension(map: util.Map[java.lang.String, AnyRef]) {
     }
 
     def generateValue(): DimensionData = {
+        logger.debug(s"GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG")
         val map = new util.HashMap[String, java.io.Serializable]()
         fields.foreach(f => map.put(f.name, f.createValue()))
         DimensionData(name, System.currentTimeMillis(), map)

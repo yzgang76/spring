@@ -1,0 +1,26 @@
+{
+  "nodes": [
+    {
+      "id": "in",
+      "type": "source_simulator",
+      "dimension": "temip_raw",
+      "interval": -1
+    },
+    {
+      "id": "out",
+      "type": "sink_print"
+    }
+  ],
+  "flows": [
+    {
+      "id": "toJson",
+      "type": "flow_map2json"
+    }],
+  "connections": [
+    {
+      "from": "in",
+      "to":"out",
+      "via": ["toJson"]
+    }
+  ]
+}

@@ -97,4 +97,8 @@ object JsonTest extends App {
         case _ => println(s"eeeeee ${res.getClass}")
     }
 
+    val c=classOf[Int]
+    val b=(c, 1.asInstanceOf[AnyVal])
+
+
 }

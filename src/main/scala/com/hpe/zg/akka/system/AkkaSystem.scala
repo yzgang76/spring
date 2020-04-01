@@ -44,15 +44,15 @@ object AkkaSystemTest extends App {
     import scala.util.{Failure, Success}
 
     implicit val system: ActorSystem[OssmBeMessage] = ActorSystem(AkkaSystem(), "akkaSystem", ConfigFactory.load("clustermanager"))
-    implicit val timeout: Timeout = 60.seconds
+    implicit val timeout: Timeout = 5.seconds
     implicit val ec: ExecutionContextExecutor = system.executionContext
-
+//    implicit val scheduler: Scheduler = system.scheduler
     val f: Future[GetDimensionResponse] = system.ask[GetDimensionResponse](ref => {
         GetDimension(
             name = "temip_raw",
             replyTo = ref
         )
-    })(timeout = timeout, scheduler = system.scheduler)
+    })
 
     f.onComplete {
         case Success(r) => println(s"_________________\n${r.dimension}\n${r.dimension.generateValue()}")

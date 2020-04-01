@@ -1,0 +1,42 @@
+{
+  "nodes": [
+    {
+      "id": "in",
+      "type": "source_simulator",
+      "dimension": "temip_raw",
+      "interval": -1
+    },
+    {
+      "id": "broadcast",
+      "type": "shape_broadcast",
+      "out": 2
+    },
+    {
+      "id": "merge",
+      "type": "shape_merge",
+      "in": 2
+    },
+    {
+      "id": "out",
+      "type": "sink_last"
+    }
+  ],
+  "flows": [
+    {
+      "id": "toJson",
+      "type": "flow_map2json"
+    },
+    {
+      "id": "mkDelete",
+      "type": "flow_map",
+      "function": "{\"event_type\"=\"DELETE\"}"
+    }
+  ],
+  "connections": [
+    {
+      "from": "in",
+      "to": "broadcast",
+      "via": []
+    }
+  ]
+}
