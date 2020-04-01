@@ -174,10 +174,9 @@ object GraphTest extends App {
             }
 
             @scala.annotation.tailrec
-            def connectToFlows(out: PortOps[Serializable], flows: List[Flow[Serializable, Serializable, AnyRef]]): PortOps[Serializable] = {
+            def connectToFlows(out: PortOps[Serializable], flows: List[Flow[Serializable, Serializable, AnyRef]]): PortOps[Serializable] =
                 if (flows.isEmpty) out
-                else connectToFlows(out ~> flows.head, flows.slice(1, flows.length - 1))
-            }
+                else connectToFlows(out ~> flows.head, flows.slice(1, flows.length))
 
             val viaIds = conn.get("via").asInstanceOf[util.ArrayList[String]]
             connectToFlows(from, viaIds.asScala.map(id => flows(id)).toList) ~> to

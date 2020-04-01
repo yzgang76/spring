@@ -65,7 +65,7 @@ case class Field(name: String, `type`: String, unique: Boolean, enum: Option[Arr
     def createValue(): java.io.Serializable = {
         `type` match {
             case "string" =>
-                if (unique) name + System.currentTimeMillis
+                if (unique) name + System.nanoTime
                 else if (enum.isDefined) try {
                     randomValue(enum.get).trim
                 } catch {
