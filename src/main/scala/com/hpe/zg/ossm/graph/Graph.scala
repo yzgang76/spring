@@ -34,57 +34,57 @@ object Graph {
     def apply(name: String, map: util.Map[String, AnyRef], dimensionRepository: ActorRef[DimensionRepositoryMessage]): Behavior[GraphMessage] =
         Behaviors.setup { context =>
             context.log.debug(s"Graph $name Starting")
-            val graph = RunnableGraph.fromGraph(GraphDSL.create() { implicit builder: GraphDSL.Builder[NotUsed] =>
+//            val graph = RunnableGraph.fromGraph(GraphDSL.create() { implicit builder: GraphDSL.Builder[NotUsed] =>
+//
+//                import GraphDSL.Implicits._
+//
+//                val sources = mutable.HashMap[String, Source[Serializable, AnyRef]]()
+//                val sinks = mutable.HashMap[String, Sink[Serializable, AnyRef]]()
+//                val shapeBroadcasts = mutable.HashMap[String, UniformFanOutShape[Serializable, Serializable]]()
+//                val shapeMerges = mutable.HashMap[String, MergePreferred.MergePreferredShape[Serializable]]()
+//                val flows = mutable.HashMap[String, Flow[Serializable, Serializable, AnyRef]]()
 
-                import GraphDSL.Implicits._
-
-                val sources = mutable.HashMap[String, Source[Serializable, AnyRef]]()
-                val sinks = mutable.HashMap[String, Sink[Serializable, AnyRef]]()
-                val shapeBroadcasts = mutable.HashMap[String, UniformFanOutShape[Serializable, Serializable]]()
-                val shapeMerges = mutable.HashMap[String, MergePreferred.MergePreferredShape[Serializable]]()
-                val flows = mutable.HashMap[String, Flow[Serializable, Serializable, AnyRef]]()
-
-                val nodes = map.get("nodes").asInstanceOf[util.ArrayList[util.Map[String, AnyRef]]]
-                nodes.asScala.collect {
-                    case node: util.Map[String, AnyRef]
-                        if Node_Type.SOURCE_SIMULATOR.equals(node.get("type").toString) =>
-                        sources(node.get("id").toString) = SourceSimulator(node).get
-                    case node: util.Map[String, AnyRef]
-                        if Node_Type.SINK_LAST.equals(node.get("type").toString) =>
-                        sinks(node.get("id").toString) = SinkLast(node).get
-                    case node: util.Map[String, AnyRef]
-                        if Node_Type.SHAPE_BROADCAST.equals(node.get("type").toString) =>
-                        shapeBroadcasts(node.get("id").toString) = ShapeBroadcast(node, builder).get
-                    case node: util.Map[String, AnyRef]
-                        if Node_Type.SHAPE_MERGE.equals(node.get("type").toString) =>
-                        shapeMerges(node.get("id").toString) = ShapeMerge(node, builder).get
-                    case _ =>
-                }
-
-                val flows2 = map.get("flows").asInstanceOf[util.ArrayList[util.Map[String, AnyRef]]]
-                flows2.asScala.collect {
-                    case node: util.Map[String, AnyRef]
-                        if Node_Type.FLOW_MAP2JSON.equals(node.get("type").toString) =>
-                        flows(node.get("id").toString) = FlowMap2Json().get
-                    case node: util.Map[String, AnyRef]
-                        if Node_Type.FLOW_MAP.equals(node.get("type").toString) =>
-                        flows(node.get("id").toString) = FlowMap(map).get
-                    case _ =>
-                }
-                val connections = map.get("connections").asInstanceOf[util.ArrayList[util.Map[String, AnyRef]]]
-                connections.forEach(conn => {
-                    val fromId = conn.get("from").toString
-                    val toId = conn.get("to").toString
-                    val viaIds = conn.get("via").asInstanceOf[util.ArrayList[String]]
-                    val from: Graph[Shape,Object] = sources.getOrElse(fromId, null)
-                    val to = sinks.getOrElse(toId, shapeBroadcasts.getOrElse(toId, shapeMerges.getOrElse(toId, null)))
-
-                    builder.add(from).outlets(0) ~> Sink.ignore
-                })
-
-//                Source.single(1) ~> Sink.ignore
-                ClosedShape
-            })
+//                val nodes = map.get("nodes").asInstanceOf[util.ArrayList[util.Map[String, AnyRef]]]
+//                nodes.asScala.collect {
+//                    case node: util.Map[String, AnyRef]
+//                        if Node_Type.SOURCE_SIMULATOR.equals(node.get("type").toString) =>
+//                        sources(node.get("id").toString) = SourceSimulator(node).get
+//                    case node: util.Map[String, AnyRef]
+//                        if Node_Type.SINK_LAST.equals(node.get("type").toString) =>
+//                        sinks(node.get("id").toString) = SinkLast(node).get
+//                    case node: util.Map[String, AnyRef]
+//                        if Node_Type.SHAPE_BROADCAST.equals(node.get("type").toString) =>
+//                        shapeBroadcasts(node.get("id").toString) = ShapeBroadcast(node).get
+//                    case node: util.Map[String, AnyRef]
+//                        if Node_Type.SHAPE_MERGE.equals(node.get("type").toString) =>
+//                        shapeMerges(node.get("id").toString) = ShapeMerge(node).get
+//                    case _ =>
+//                }
+//
+//                val flows2 = map.get("flows").asInstanceOf[util.ArrayList[util.Map[String, AnyRef]]]
+//                flows2.asScala.collect {
+//                    case node: util.Map[String, AnyRef]
+//                        if Node_Type.FLOW_MAP2JSON.equals(node.get("type").toString) =>
+//                        flows(node.get("id").toString) = FlowMap2Json().get
+//                    case node: util.Map[String, AnyRef]
+//                        if Node_Type.FLOW_MAP.equals(node.get("type").toString) =>
+//                        flows(node.get("id").toString) = FlowMap(map).get
+//                    case _ =>
+//                }
+//                val connections = map.get("connections").asInstanceOf[util.ArrayList[util.Map[String, AnyRef]]]
+//                connections.forEach(conn => {
+//                    val fromId = conn.get("from").toString
+//                    val toId = conn.get("to").toString
+//                    val viaIds = conn.get("via").asInstanceOf[util.ArrayList[String]]
+//                    val from: Graph[Shape,Object] = sources.getOrElse(fromId, null)
+//                    val to = sinks.getOrElse(toId, shapeBroadcasts.getOrElse(toId, shapeMerges.getOrElse(toId, null)))
+//
+//                    builder.add(from).outlets(0) ~> Sink.ignore
+//                })
+//
+////                Source.single(1) ~> Sink.ignore
+//                ClosedShape
+//            })
 
             Behaviors.receiveMessage[GraphMessage] {
                 case msg: GraphMessage =>
@@ -99,24 +99,5 @@ object Graph {
 }
 
 /*
- {
-      "from": "in",
-      "to": "broadcast",
-      "via": []
-    },
-    {
-      "from": "broadcast",
-      "to": "merge",
-      "via": []
-    },
-    {
-      "from": "broadcast",
-      "to": "merge",
-      "via": ["mkDelete"]
-    },
-    {
-      "from": "merge",
-      "to": "out",
-      "via": ["toJson"]
-    }
+
  */

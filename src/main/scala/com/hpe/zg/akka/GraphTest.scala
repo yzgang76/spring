@@ -112,10 +112,6 @@ object GraphTest extends App {
         import GraphDSL.Implicits._
 
         val shapes = mutable.HashMap[String, AnyRef]()
-        val sources = mutable.HashMap[String, Source[Serializable, AnyRef]]()
-        val sinks = mutable.HashMap[String, Sink[Serializable, AnyRef]]()
-        val shapeBroadcasts = mutable.HashMap[String, UniformFanOutShape[Serializable, Serializable]]()
-        val shapeMerges = mutable.HashMap[String, MergePreferred.MergePreferredShape[Serializable]]()
         val flows = mutable.HashMap[String, Flow[Serializable, Serializable, AnyRef]]()
 
         val ports = mutable.HashMap[(String, String), Int]()
@@ -143,11 +139,11 @@ object GraphTest extends App {
             case node: util.Map[String, AnyRef]
                 if Node_Type.SHAPE_BROADCAST.equals(node.get("type").toString) =>
                 //                shapeBroadcasts(node.get("id").toString) = ShapeBroadcast(node, builder).get
-                shapes(node.get("id").toString) = ShapeBroadcast(node, builder).get
+                shapes(node.get("id").toString) = ShapeBroadcast(node).get
             case node: util.Map[String, AnyRef]
                 if Node_Type.SHAPE_MERGE.equals(node.get("type").toString) =>
                 //                shapeMerges(node.get("id").toString) = ShapeMerge(node, builder).get
-                shapes(node.get("id").toString) = ShapeBroadcast(node, builder).get
+                shapes(node.get("id").toString) = ShapeBroadcast(node).get
             case _ =>
         }
 
@@ -158,7 +154,7 @@ object GraphTest extends App {
                 flows(node.get("id").toString) = FlowMap2Json().get
             case node: util.Map[String, AnyRef]
                 if Node_Type.FLOW_MAP.equals(node.get("type").toString) =>
-                flows(node.get("id").toString) = FlowMap(map).get
+                flows(node.get("id").toString) = FlowMap(node).get
             case _ =>
         }
         val connections = map.get("connections").asInstanceOf[util.ArrayList[util.Map[String, AnyRef]]]
@@ -167,19 +163,19 @@ object GraphTest extends App {
             val from = shapes.getOrElse(fromId, null) match {
                 case s: Graph[SourceShape[Serializable], Any] => builder.add(s).out
                 case s: GraphStage[UniformFanOutShape[Serializable, Serializable]] => builder.add(s).out(getPort(fromId, "out"))
-                case s: GraphStage[UniformFanInShape[Serializable, Serializable]] => builder.add(s).out
+                case s: GraphStage[MergePreferred.MergePreferredShape[Serializable]] => builder.add(s).out
             }
 
             val toId = conn.get("to").toString
             val to = shapes.getOrElse(toId, null) match {
                 case s: Graph[SinkShape[Serializable], Any] => builder.add(s).in
                 case s: GraphStage[UniformFanOutShape[Serializable, Serializable]] => builder.add(s).in
-                case s: GraphStage[UniformFanInShape[Serializable, Serializable]] => builder.add(s).in(getPort(toId, "in"))
+                case s: GraphStage[MergePreferred.MergePreferredShape[Serializable]] => builder.add(s).in(getPort(toId, "in"))
             }
 
             @scala.annotation.tailrec
             def connectToFlows(out: PortOps[Serializable], flows: List[Flow[Serializable, Serializable, AnyRef]]): PortOps[Serializable] = {
-                if(flows.isEmpty) out
+                if (flows.isEmpty) out
                 else connectToFlows(out ~> flows.head, flows.slice(1, flows.length - 1))
             }
 

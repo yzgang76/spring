@@ -37,6 +37,21 @@
       "from": "in",
       "to": "broadcast",
       "via": []
+    },
+    {
+      "from": "broadcast",
+      "to": "merge",
+      "via": []
+    },
+    {
+      "from": "broadcast",
+      "to": "merge",
+      "via": ["mkDelete"]
+    },
+    {
+      "from": "merge",
+      "to": "out",
+      "via": ["toJson"]
     }
   ]
 }

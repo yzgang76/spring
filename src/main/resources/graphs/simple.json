@@ -4,7 +4,8 @@
       "id": "in",
       "type": "source_simulator",
       "dimension": "temip_raw",
-      "interval": -1
+      "interval": 0,
+      "number": 10
     },
     {
       "id": "out",
@@ -15,12 +16,23 @@
     {
       "id": "toJson",
       "type": "flow_map2json"
-    }],
+    },
+    {
+      "id": "mkDelete",
+      "type": "flow_map",
+      "function": {
+        "event_type": "DELETE"
+      }
+    }
+  ],
   "connections": [
     {
       "from": "in",
-      "to":"out",
-      "via": ["toJson"]
+      "to": "out",
+      "via": [
+        "mkDelete",
+        "toJson"
+      ]
     }
   ]
 }
