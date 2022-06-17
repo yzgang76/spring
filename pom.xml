@@ -33,7 +33,7 @@
         <spring-boot-starter-bom.version>2.2.5.RELEASE</spring-boot-starter-bom.version>
         <spring-boot.version>2.2.5.RELEASE</spring-boot.version>
         <springloaded.version>1.2.8.RELEASE</springloaded.version>
-        <fastjson.version>1.2.62</fastjson.version>
+        <fastjson.version>1.2.83</fastjson.version>
         <maven-scala-plugin.version>2.15.2</maven-scala-plugin.version>
         <docker-maven-plugin.version>1.2.2</docker-maven-plugin.version>
         <expose.port>8081</expose.port>
